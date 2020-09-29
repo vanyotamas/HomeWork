@@ -86,4 +86,8 @@ public class Task {
     public void addTask(Task task) {
         tasks.addTask(task);
     }
+
+    public boolean hasTasks() {
+        return getTasks().size() > 0;
+    }
 }

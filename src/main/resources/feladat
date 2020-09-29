@@ -26,3 +26,8 @@ a kapcsolat minősége különböző lehet: CHILD, PARENT, PRECEDESSOR)
 - Egy feladatot ne lehessen DONE státuszba helyezni, amíg a CHILD relációban lévő feladatok nincsenek mind DONE státuszban
 - Egy feladatot ne lehessen IN_PROGRESS státuszba helyezni amíg a PRECEDESSOR típusú linkelt feladatok nincsenek DONE státuszban
 
+Kérdéseim:
+- nem kellene bele valami azonosító?
+- a linkelt feladatoknak lehetnek linkelt feladatai?
+- ha igen, akkor pl. a törlés a teljes mélységig menjen le?
+
