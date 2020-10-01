@@ -86,13 +86,14 @@ public class Task {
         Task task = (Task) o;
         return runningHour == task.runningHour &&
                 Objects.equals(user, task.user) &&
+                Objects.equals(description, task.description) &&
                 status == task.status &&
-                Objects.equals(description, task.description);
+                taskConnection == task.taskConnection;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, runningHour, status, description);
+        return Objects.hash(user, runningHour, description, status, taskConnection);
     }
 
     @Override
@@ -102,8 +103,8 @@ public class Task {
                 ", runningHour=" + runningHour +
                 ", status=" + status +
                 ", description='" + description + '\'' +
-                ", tasks=" + tasks.toString() +
                 ", taskConnection=" + taskConnection +
+                "\n Tasks=" + tasks.toString() +
                 '}';
     }
 

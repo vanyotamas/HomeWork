@@ -101,7 +101,7 @@ public class Tasks {
      * Egy feladatot nem lehet törölni, míg a CHILD relációban lévő alfeladatok léteznek a rendszerben, vagy nincsenek DONE állapotban)
      * @param task Törlendő task
      */
-    public void removeTask(Task task) throws TaskRemoveException, TaskNotFoundException {
+    public void removeTask(Task task) {
         if (!isTaskExists(task, false))
             throw new TaskNotFoundException(task);
 
