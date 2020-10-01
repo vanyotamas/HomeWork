@@ -1,17 +1,29 @@
 package hu.kincstar.javasetraining.homework;
 
-import java.util.List;
 import java.util.Objects;
+
+import static hu.kincstar.javasetraining.homework.TaskStatus.*;
 
 public class Task {
     private String user;
     private int runningHour;
-    private TaskStatus status;
     private String description;
-    private Tasks tasks;
+    private TaskStatus status;
     private TaskConnection taskConnection;
+    private Tasks tasks = new Tasks();
 
-    public Task(String user, int runningHour, TaskStatus status, String description) {
+    public Task(String user, int runningHour) {
+        this.user = user;
+        if (!Fibonacci.isFibonacciNumber(runningHour))
+            throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
+        this.runningHour = runningHour;
+        this.status = NEW;
+        this.description = "";
+        this.taskConnection = TaskConnection.BASE;
+    }
+
+    public Task(String user, int runningHour, String description,
+                TaskStatus status) {
         this.user = user;
         if (!Fibonacci.isFibonacciNumber(runningHour))
             throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
@@ -21,13 +33,25 @@ public class Task {
         this.taskConnection = TaskConnection.BASE;
     }
 
-    public Task(String user, int runningHour, TaskStatus status, String description, TaskConnection taskConnection) {
+    public Task(String user, int runningHour, String description,
+                TaskStatus status, TaskConnection taskConnection) {
         this.user = user;
         if (!Fibonacci.isFibonacciNumber(runningHour))
             throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
         this.runningHour = runningHour;
         this.status = status;
         this.description = description;
+        this.taskConnection = taskConnection;
+    }
+
+    public Task(String user, int runningHour, String description,
+                TaskStatus status, TaskConnection taskConnection, Tasks tasks) {
+        this.user = user;
+        if (!Fibonacci.isFibonacciNumber(runningHour))
+            throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
+        this.status = status;
+        this.description = description;
+        this.tasks = tasks;
         this.taskConnection = taskConnection;
     }
 
@@ -83,11 +107,50 @@ public class Task {
                 '}';
     }
 
+    /**
+     * Vannak-e alfeladatai az adott feladatnak
+     * @return vannak-e
+     */
+    public boolean hasTasks() {
+        return getTasks().size() > 0;
+    }
+
     public void addTask(Task task) {
         tasks.addTask(task);
     }
 
-    public boolean hasTasks() {
-        return getTasks().size() > 0;
+    /***
+     * Feladat állapotának beállítása
+     * @param ts Állapot felsorolás
+     * @throws TaskSetStatusDoneException DONE csak akkor, ha a CHIELD-ek mind DONE-ok
+     * @throws TaskSetStatusInProgressException IIN_PROGRESS csak akkor, ha a PREDECESSOR-ok mind DONE-ok
+     */
+    public void setStatus(TaskStatus ts) throws TaskSetStatusDoneException, TaskSetStatusInProgressException {
+        switch (ts) {
+            case BLOCKED:
+                status = ts;
+                break;
+            case DONE:
+                if (!hasTasks())
+                    status = ts;
+                else
+                    if (tasks.isAll(TaskConnection.CHILD, DONE))
+                        status = ts;
+                    else
+                        throw new TaskSetStatusDoneException(this);
+                break;
+            case IN_PROGRESS:
+                if (!hasTasks())
+                    status = ts;
+                else
+                if (tasks.isAll(TaskConnection.PRECEDESSOR, DONE))
+                    status = ts;
+                else
+                    throw new TaskSetStatusInProgressException(this);
+                break;
+            case NEW:
+                status = ts;
+                break;
+        }
     }
 }
