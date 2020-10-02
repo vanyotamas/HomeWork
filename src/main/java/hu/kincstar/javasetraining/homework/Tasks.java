@@ -3,6 +3,9 @@ package hu.kincstar.javasetraining.homework;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Feladatok "lista" osztály
+ */
 public class Tasks {
     private List<Task> tasks = new ArrayList<>();
 
@@ -13,11 +16,15 @@ public class Tasks {
         this.tasks = tasks;
     }
 
+    /**
+     * Feladat hozzáadása a listához
+     * @param task Hozzáadandó feladat
+     */
     public void addTask(Task task) {
         if (task == null)
-            throw new IllegalArgumentException("addTask parameter is null");
+            throw new IllegalArgumentException(ErrorCodes.ERROR_ADDTASK_PARAM_NULL.getMessage());
         if (findTask(task, false) != null)
-            throw new IllegalArgumentException("Tasks already has this task");
+            throw new IllegalArgumentException(ErrorCodes.ERROR_ADDTASK_ALREADY_HAS.getMessage());
         tasks.add(task);
     }
 
@@ -105,12 +112,18 @@ public class Tasks {
         if (!isTaskExists(task, false))
             throw new TaskNotFoundException(task);
 
-        if (!task.getTasks().isAll(TaskConnection.CHILD, TaskStatus.DONE))
+        if (!task.getTasks().isAll(TaskConnection.CHILD, TaskStatus.DONE, true))
             throw new TaskRemoveException(task);
 
         tasks.remove(task);
     }
 
+    /**
+     * Task keresése a listában
+     * @param task keresendő Task
+     * @param recursive rekurzív végrehajtás?
+     * @return megtalált Task vagy null
+     */
     public Task findTask(Task task, boolean recursive) {
         Task res = null;
         for (Task t : tasks) {
@@ -124,39 +137,58 @@ public class Tasks {
         return res;
     }
 
+    /**
+     * Létezik-e az adott Task
+     * @param task keresendő Task
+     * @param recursive rekurzív végrehajtás?
+     * @return megatalálta?
+     */
     public boolean isTaskExists(Task task, boolean recursive)
     {
         Task res = findTask(task, recursive);
         return res == task;
     }
 
-
     /**
      * Minden megadott kapcsolatú feladat a megadott státuszú-e
      * Végigmegy a teljes fán
      * @param tc kapcsolat típusa
      * @param ts státsuz típusa
+     * @param recursive rekurzív végrehajtás?
      * @return megadott állapitúak-e a kapcsolatok
      */
-    public boolean isAll(TaskConnection tc, TaskStatus ts) {
+    public boolean isAll(TaskConnection tc, TaskStatus ts, boolean recursive) {
         boolean res = true;
         for (Task task : tasks) {
             if (task.getTaskConnection() == tc)
-                res &= task.getStatus() == ts;
-            if (task.hasTasks())
-                res &= task.getTasks().isAll(tc, ts);
+                res &= (task.getStatus() == ts);
+            if (recursive && task.hasTasks())
+                res &= task.getTasks().isAll(tc, ts, true);
         }
         return res;
     }
 
-    private int numberOfConnection(TaskConnection tc) {
+    /**
+     * Megszámolja a feladatlistában a megadott kapcsolatú feladatokat
+     * @param tc feladat kapcsolat fajtája
+     * @param recursive rekurzív végrehajtás?
+     * @return feladatok száma
+     */
+    private int numberOfConnection(TaskConnection tc, boolean recursive) {
         int res = 0;
-        for (Task task : tasks)
+        for (Task task : tasks) {
             if (task.getTaskConnection() == tc)
                 res++;
+            if (recursive && task.hasTasks())
+                res += task.getTasks().numberOfConnection(tc, true);
+        }
         return res;
     }
 
+    /**
+     * Feladatok számának meghatározása
+     * @return feladatok száma
+     */
     public int size()
     {
         return tasks.size();

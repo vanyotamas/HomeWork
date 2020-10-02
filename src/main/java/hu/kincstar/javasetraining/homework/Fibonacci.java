@@ -1,6 +1,14 @@
 package hu.kincstar.javasetraining.homework;
 
+/**
+ * Fibonacci szám kezelésére alkalmas osztály
+ */
 public class Fibonacci {
+    /**
+     * Eldönti a megadott értékről, hogy Fibonacci szám-e
+     * @param f vizsgálandó érték
+     * @return Fibonacci szám-e?
+     */
     public static boolean isFibonacciNumber(int f)
     {
         if (f < 0) return false;

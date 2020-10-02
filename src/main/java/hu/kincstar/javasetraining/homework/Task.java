@@ -4,57 +4,86 @@ import java.util.Objects;
 
 import static hu.kincstar.javasetraining.homework.TaskStatus.*;
 
+/**
+ * Feladat osztály
+ */
 public class Task {
-    private String user;
-    private int runningHour;
-    private String description;
-    private TaskStatus status;
-    private TaskConnection taskConnection;
-    private Tasks tasks = new Tasks();
 
+    // region Tulajdonságok
+    /**
+     * Feladat felhasználója tulajdonság
+     */
+    private String user;
+
+    /**
+     * Becsült végrehajtási idő órában tulajdonság
+     */
+    private int runningHour;
+
+    /**
+     * Feladat leírása tulajdonság
+     */
+    private String description;
+
+    /**
+     * Feladat státusza tulajdonság
+     */
+    private TaskStatus status;
+
+    /**
+     * Feladat kapcsolati szintje tulajdonság
+     */
+    private TaskConnection taskConnection;
+
+    /**
+     * Alfeladatok listája tulajdonság
+     */
+    private Tasks tasks = new Tasks();
+    // endregion
+
+    // region Konstruktorok
     public Task(String user, int runningHour) {
-        this.user = user;
-        if (!Fibonacci.isFibonacciNumber(runningHour))
-            throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
-        this.runningHour = runningHour;
-        this.status = NEW;
-        this.description = "";
-        this.taskConnection = TaskConnection.BASE;
+        TaskConstructor(user, runningHour, "", TaskStatus.NEW, TaskConnection.BASE, null);
     }
 
     public Task(String user, int runningHour, String description,
                 TaskStatus status) {
-        this.user = user;
-        if (!Fibonacci.isFibonacciNumber(runningHour))
-            throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
-        this.runningHour = runningHour;
-        this.status = status;
-        this.description = description;
-        this.taskConnection = TaskConnection.BASE;
+        TaskConstructor(user, runningHour, description, status, TaskConnection.BASE, null);
     }
 
     public Task(String user, int runningHour, String description,
                 TaskStatus status, TaskConnection taskConnection) {
-        this.user = user;
-        if (!Fibonacci.isFibonacciNumber(runningHour))
-            throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
-        this.runningHour = runningHour;
-        this.status = status;
-        this.description = description;
-        this.taskConnection = taskConnection;
+        TaskConstructor(user, runningHour, description, status, taskConnection, null);
     }
 
     public Task(String user, int runningHour, String description,
                 TaskStatus status, TaskConnection taskConnection, Tasks tasks) {
-        this.user = user;
-        if (!Fibonacci.isFibonacciNumber(runningHour))
-            throw new IllegalArgumentException("Task running time isn't a Fibonacci number!");
-        this.status = status;
-        this.description = description;
-        this.tasks = tasks;
-        this.taskConnection = taskConnection;
+        TaskConstructor(user, runningHour, description, status, taskConnection, tasks);
     }
 
+    /**
+     * Közös konstruktor
+     * @param user Felhasználó
+     * @param runningHour Futási idő
+     * @param description Leírás
+     * @param status Státusz
+     * @param taskConnection Kapcsolat
+     * @param tasks Alfeladatok
+     */
+    private void TaskConstructor(String user, int runningHour, String description,
+                TaskStatus status, TaskConnection taskConnection, Tasks tasks) {
+        this.user = user;
+        if (!Fibonacci.isFibonacciNumber(runningHour))
+            throw new IllegalArgumentException(ErrorCodes.ERROR_NOT_FIBONACCI.getMessage());
+        this.status = status;
+        this.description = description;
+        this.taskConnection = taskConnection;
+        if (tasks != null)
+            this.tasks = tasks;
+    }
+    // endregion
+
+    // region Getter-ek, Setter-ek
     public String getUser() {
         return user;
     }
@@ -79,6 +108,23 @@ public class Task {
         return taskConnection;
     }
 
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public void setRunningHour(int runningHour) {
+        this.runningHour = runningHour;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setTaskConnection(TaskConnection taskConnection) {
+        this.taskConnection = taskConnection;
+    }
+    // endregion
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,16 +144,26 @@ public class Task {
 
     @Override
     public String toString() {
+        return toString(false);
+    }
+
+    /**
+     * Feladat adatainak összeszedése
+     * @param recursive rekurzív végrehajtás?
+     * @return feladat(ok) jellemző adatai
+     */
+    public String toString(boolean recursive) {
         return "Task{" +
                 "user='" + user + '\'' +
                 ", runningHour=" + runningHour +
-                ", status=" + status +
                 ", description='" + description + '\'' +
+                ", status=" + status +
                 ", taskConnection=" + taskConnection +
-                "\n Tasks=" + tasks.toString() +
+                (recursive && hasTasks() ? "\nTasks=[\n" + tasks.toString() + "]\n" : "") +
                 '}';
     }
 
+    // region Feladat műveletek
     /**
      * Vannak-e alfeladatai az adott feladatnak
      * @return vannak-e
@@ -116,6 +172,10 @@ public class Task {
         return getTasks().size() > 0;
     }
 
+    /**
+     * Feladat hozzáadása az "al"feladatokhoz
+     * @param task Hozzáadandó feladat
+     */
     public void addTask(Task task) {
         tasks.addTask(task);
     }
@@ -129,29 +189,36 @@ public class Task {
     public void setStatus(TaskStatus ts) throws TaskSetStatusDoneException, TaskSetStatusInProgressException {
         switch (ts) {
             case BLOCKED:
-                status = ts;
+                if (TaskStatus.isStatusChangeable(getStatus(), NEW))
+                    status = ts;
+                break;
+            case NEW:
+                if (TaskStatus.isStatusChangeable(getStatus(), NEW))
+                    status = ts;
                 break;
             case DONE:
+                if (!TaskStatus.isStatusChangeable(getStatus(), DONE))
+                    throw new TaskChangeStatusDoneException(this);
                 if (!hasTasks())
                     status = ts;
                 else
-                    if (tasks.isAll(TaskConnection.CHILD, DONE))
+                    if (tasks.isAll(TaskConnection.CHILD, DONE, true))
                         status = ts;
                     else
                         throw new TaskSetStatusDoneException(this);
                 break;
             case IN_PROGRESS:
+                if (!TaskStatus.isStatusChangeable(getStatus(), IN_PROGRESS))
+                    throw new TaskChangeStatusInProgressException(this);
                 if (!hasTasks())
                     status = ts;
                 else
-                if (tasks.isAll(TaskConnection.PRECEDESSOR, DONE))
-                    status = ts;
-                else
-                    throw new TaskSetStatusInProgressException(this);
-                break;
-            case NEW:
-                status = ts;
+                    if (tasks.isAll(TaskConnection.PRECEDESSOR, DONE, true))
+                        status = ts;
+                    else
+                        throw new TaskSetStatusInProgressException(this);
                 break;
         }
     }
+    // endregion
 }
