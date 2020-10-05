@@ -1,5 +1,7 @@
 package hu.kincstar.javasetraining.homework;
 
+import hu.kincstar.javasetraining.homework.exceptions.*;
+
 import java.util.Objects;
 
 import static hu.kincstar.javasetraining.homework.TaskStatus.*;
@@ -38,17 +40,21 @@ public class Task {
     /**
      * Alfeladatok listája tulajdonság
      */
-    private Tasks tasks = new Tasks();
+    private Tasks relatedTasks = new Tasks();
     // endregion
 
     // region Konstruktorok
     public Task(String user, int runningHour) {
-        TaskConstructor(user, runningHour, "", TaskStatus.NEW, TaskConnection.BASE, null);
+        TaskConstructor(user, runningHour, "", TaskStatus.NEW, TaskConnection.PARENT, null);
+    }
+
+    public Task(String user, int runningHour, String description) {
+        TaskConstructor(user, runningHour, description, NEW, TaskConnection.PARENT, null);
     }
 
     public Task(String user, int runningHour, String description,
                 TaskStatus status) {
-        TaskConstructor(user, runningHour, description, status, TaskConnection.BASE, null);
+        TaskConstructor(user, runningHour, description, status, TaskConnection.PARENT, null);
     }
 
     public Task(String user, int runningHour, String description,
@@ -57,8 +63,8 @@ public class Task {
     }
 
     public Task(String user, int runningHour, String description,
-                TaskStatus status, TaskConnection taskConnection, Tasks tasks) {
-        TaskConstructor(user, runningHour, description, status, taskConnection, tasks);
+                TaskStatus status, TaskConnection taskConnection, Tasks relatedTasks) {
+        TaskConstructor(user, runningHour, description, status, taskConnection, relatedTasks);
     }
 
     /**
@@ -68,18 +74,18 @@ public class Task {
      * @param description Leírás
      * @param status Státusz
      * @param taskConnection Kapcsolat
-     * @param tasks Alfeladatok
+     * @param relatedTasks Alfeladatok
      */
     private void TaskConstructor(String user, int runningHour, String description,
-                TaskStatus status, TaskConnection taskConnection, Tasks tasks) {
+                TaskStatus status, TaskConnection taskConnection, Tasks relatedTasks) {
         this.user = user;
         if (!Fibonacci.isFibonacciNumber(runningHour))
             throw new IllegalArgumentException(ErrorCodes.ERROR_NOT_FIBONACCI.getMessage());
         this.status = status;
         this.description = description;
         this.taskConnection = taskConnection;
-        if (tasks != null)
-            this.tasks = tasks;
+        if (relatedTasks != null)
+            this.relatedTasks = relatedTasks;
     }
     // endregion
 
@@ -100,8 +106,8 @@ public class Task {
         return description;
     }
 
-    public Tasks getTasks() {
-        return tasks;
+    public Tasks getRelatedTasks() {
+        return relatedTasks;
     }
 
     public TaskConnection getTaskConnection() {
@@ -159,7 +165,7 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 ", taskConnection=" + taskConnection +
-                (recursive && hasTasks() ? "\nTasks=[\n" + tasks.toString() + "]\n" : "") +
+                (recursive && hasRelatedTasks() ? "\nTasks=[\n" + relatedTasks.toString() + "]\n" : "") +
                 '}';
     }
 
@@ -168,17 +174,26 @@ public class Task {
      * Vannak-e alfeladatai az adott feladatnak
      * @return vannak-e
      */
-    public boolean hasTasks() {
-        return getTasks().size() > 0;
+    public boolean hasRelatedTasks() {
+        return getRelatedTasks().size() > 0;
     }
 
     /**
      * Feladat hozzáadása az "al"feladatokhoz
      * @param task Hozzáadandó feladat
      */
-    public void addTask(Task task) {
-        tasks.addTask(task);
+    public void addRelatedTask(Task task) {
+        relatedTasks.addTask(task);
     }
+
+    /**
+     * Feladatat eltávolítása az "al"feladatokból
+     * @param task Törlendő feladat
+     */
+    public void removeRelatedTask(Task task) {
+        relatedTasks.removeTask(task);
+    }
+
 
     /***
      * Feladat állapotának beállítása
@@ -189,7 +204,7 @@ public class Task {
     public void setStatus(TaskStatus ts) throws TaskSetStatusDoneException, TaskSetStatusInProgressException {
         switch (ts) {
             case BLOCKED:
-                if (TaskStatus.isStatusChangeable(getStatus(), NEW))
+                if (TaskStatus.isStatusChangeable(getStatus(), BLOCKED))
                     status = ts;
                 break;
             case NEW:
@@ -199,10 +214,10 @@ public class Task {
             case DONE:
                 if (!TaskStatus.isStatusChangeable(getStatus(), DONE))
                     throw new TaskChangeStatusDoneException(this);
-                if (!hasTasks())
+                if (!hasRelatedTasks())
                     status = ts;
                 else
-                    if (tasks.isAll(TaskConnection.CHILD, DONE, true))
+                    if (relatedTasks.isAll(TaskConnection.CHILD, DONE, true))
                         status = ts;
                     else
                         throw new TaskSetStatusDoneException(this);
@@ -210,10 +225,10 @@ public class Task {
             case IN_PROGRESS:
                 if (!TaskStatus.isStatusChangeable(getStatus(), IN_PROGRESS))
                     throw new TaskChangeStatusInProgressException(this);
-                if (!hasTasks())
+                if (!hasRelatedTasks())
                     status = ts;
                 else
-                    if (tasks.isAll(TaskConnection.PRECEDESSOR, DONE, true))
+                    if (relatedTasks.isAll(TaskConnection.PRECEDESSOR, DONE, true))
                         status = ts;
                     else
                         throw new TaskSetStatusInProgressException(this);

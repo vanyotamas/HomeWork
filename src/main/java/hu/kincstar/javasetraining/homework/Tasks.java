@@ -1,5 +1,9 @@
 package hu.kincstar.javasetraining.homework;
 
+import hu.kincstar.javasetraining.homework.exceptions.ErrorCodes;
+import hu.kincstar.javasetraining.homework.exceptions.TaskNotFoundException;
+import hu.kincstar.javasetraining.homework.exceptions.TaskRemoveException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +49,8 @@ public class Tasks {
         StringBuilder s = new StringBuilder();
         for (Task task : tasks) {
             s.append(task.toString()).append("\n");
-            if (recursive && task.hasTasks())
-                s.append(task.getTasks().listTasks(true));
+            if (recursive && task.hasRelatedTasks())
+                s.append(task.getRelatedTasks().listTasks(true));
         }
         return s.toString();
     }
@@ -71,8 +75,8 @@ public class Tasks {
         for (Task task : tasks) {
             if (task.getUser().equals(user))
                 s.append(task.toString()).append("\n");
-            if (recursive && task.hasTasks())
-                s.append(task.getTasks().listTasks(user, true));
+            if (recursive && task.hasRelatedTasks())
+                s.append(task.getRelatedTasks().listTasks(user, true));
         }
         return s.toString();
     }
@@ -97,8 +101,8 @@ public class Tasks {
         for (Task task : tasks) {
             if (task.getStatus() == ts)
                 s.append(task.toString()).append("\n");
-            if (recursive && task.hasTasks())
-                s.append(task.getTasks().listTasks(ts, true));
+            if (recursive && task.hasRelatedTasks())
+                s.append(task.getRelatedTasks().listTasks(ts, true));
         }
         return s.toString();
     }
@@ -112,7 +116,7 @@ public class Tasks {
         if (!isTaskExists(task, false))
             throw new TaskNotFoundException(task);
 
-        if (!task.getTasks().isAll(TaskConnection.CHILD, TaskStatus.DONE, true))
+        if (!isAll(TaskConnection.CHILD, TaskStatus.DONE, true))
             throw new TaskRemoveException(task);
 
         tasks.remove(task);
@@ -130,8 +134,8 @@ public class Tasks {
             if (res == null) {
                 if (task.equals(t))
                     res = t;
-                if (recursive && res == null && t.hasTasks())
-                    res = task.getTasks().findTask(task, true);
+                if (recursive && res == null && t.hasRelatedTasks())
+                    res = task.getRelatedTasks().findTask(task, true);
             }
         }
         return res;
@@ -162,8 +166,8 @@ public class Tasks {
         for (Task task : tasks) {
             if (task.getTaskConnection() == tc)
                 res &= (task.getStatus() == ts);
-            if (recursive && task.hasTasks())
-                res &= task.getTasks().isAll(tc, ts, true);
+            if (recursive && task.hasRelatedTasks())
+                res &= task.getRelatedTasks().isAll(tc, ts, true);
         }
         return res;
     }
@@ -179,8 +183,8 @@ public class Tasks {
         for (Task task : tasks) {
             if (task.getTaskConnection() == tc)
                 res++;
-            if (recursive && task.hasTasks())
-                res += task.getTasks().numberOfConnection(tc, true);
+            if (recursive && task.hasRelatedTasks())
+                res += task.getRelatedTasks().numberOfConnection(tc, true);
         }
         return res;
     }

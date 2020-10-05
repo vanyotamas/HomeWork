@@ -1,4 +1,4 @@
-package hu.kincstar.javasetraining.homework;
+package hu.kincstar.javasetraining.homework.exceptions;
 
 /**
  * Hibaüzenetek

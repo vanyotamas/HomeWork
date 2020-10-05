@@ -1,5 +1,15 @@
-C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\Main.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskChangeStatusDoneException.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskNotFoundException.java
 C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\TaskStatus.java
 C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\Fibonacci.java
-C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\TaskConnection.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskSetStatusDoneException.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskSetStatusException.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\Tasks.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskRemoveException.java
 C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\Task.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskException.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\TaskApplication.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\TaskConnection.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskChangeStatusInProgressException.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\ErrorCodes.java
+C:\Users\vanyot\IdeaProjects\HomeWork\src\main\java\hu\kincstar\javasetraining\homework\exceptions\TaskSetStatusInProgressException.java

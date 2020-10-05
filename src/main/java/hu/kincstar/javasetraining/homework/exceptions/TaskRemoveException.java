@@ -1,4 +1,6 @@
-package hu.kincstar.javasetraining.homework;
+package hu.kincstar.javasetraining.homework.exceptions;
+
+import hu.kincstar.javasetraining.homework.Task;
 
 /**
  * Feladat eltávolítása kivétel

@@ -13,18 +13,21 @@ public class TaskTest {
     @Test
     public void Base() {
         Task task = new Task("vanyot", 5);
-        Assert.assertFalse(task.hasTasks());
+        Assert.assertFalse(task.hasRelatedTasks());
         // hiányos konstruktor miatti ellenőrzések
         Assert.assertEquals(task.getStatus(), TaskStatus.NEW);
-        Assert.assertEquals(task.getTaskConnection(), TaskConnection.BASE);
+        Assert.assertEquals(task.getTaskConnection(),
+                TaskConnection.PARENT);
 
         // sima feladatok hozzáadása
-        Task task2 = new Task("vanyot", 3, "leírás2", TaskStatus.NEW, TaskConnection.CHILD);
-        Task task3 = new Task("vanyot2", 2, "leírás2", TaskStatus.BLOCKED, TaskConnection.PARENT);
-        task.addTask(task2);
-        task.addTask(task3);
+        Task task2 = new Task("vanyot", 3, "leírás2",
+                TaskStatus.NEW, TaskConnection.CHILD);
+        Task task3 = new Task("vanyot2", 2, "leírás2",
+                TaskStatus.BLOCKED, TaskConnection.PARENT);
+        task.addRelatedTask(task2);
+        task.addRelatedTask(task3);
 
-        Assert.assertTrue(task.hasTasks());
-        Assert.assertEquals(task.getTasks().size(), 2);
+        Assert.assertTrue(task.hasRelatedTasks());
+        Assert.assertEquals(task.getRelatedTasks().size(), 2);
     }
 }
