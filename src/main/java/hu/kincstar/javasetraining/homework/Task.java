@@ -1,10 +1,7 @@
 package hu.kincstar.javasetraining.homework;
 
 import hu.kincstar.javasetraining.homework.exceptions.*;
-
 import java.util.Objects;
-
-import static hu.kincstar.javasetraining.homework.TaskStatus.*;
 
 /**
  * Feladat osztály
@@ -49,7 +46,7 @@ public class Task {
     }
 
     public Task(String user, int runningHour, String description) {
-        TaskConstructor(user, runningHour, description, NEW, TaskConnection.PARENT, null);
+        TaskConstructor(user, runningHour, description, TaskStatus.NEW, TaskConnection.PARENT, null);
     }
 
     public Task(String user, int runningHour, String description,
@@ -204,31 +201,31 @@ public class Task {
     public void setStatus(TaskStatus ts) throws TaskSetStatusDoneException, TaskSetStatusInProgressException {
         switch (ts) {
             case BLOCKED:
-                if (TaskStatus.isStatusChangeable(getStatus(), BLOCKED))
+                if (TaskStatus.isStatusChangeable(getStatus(), TaskStatus.BLOCKED))
                     status = ts;
                 break;
             case NEW:
-                if (TaskStatus.isStatusChangeable(getStatus(), NEW))
+                if (TaskStatus.isStatusChangeable(getStatus(), TaskStatus.NEW))
                     status = ts;
                 break;
             case DONE:
-                if (!TaskStatus.isStatusChangeable(getStatus(), DONE))
+                if (!TaskStatus.isStatusChangeable(getStatus(), TaskStatus.DONE))
                     throw new TaskChangeStatusDoneException(this);
                 if (!hasRelatedTasks())
                     status = ts;
                 else
-                    if (relatedTasks.isAll(TaskConnection.CHILD, DONE, true))
+                    if (relatedTasks.isAll(TaskConnection.CHILD, TaskStatus.DONE, true))
                         status = ts;
                     else
                         throw new TaskSetStatusDoneException(this);
                 break;
             case IN_PROGRESS:
-                if (!TaskStatus.isStatusChangeable(getStatus(), IN_PROGRESS))
+                if (!TaskStatus.isStatusChangeable(getStatus(), TaskStatus.IN_PROGRESS))
                     throw new TaskChangeStatusInProgressException(this);
                 if (!hasRelatedTasks())
                     status = ts;
                 else
-                    if (relatedTasks.isAll(TaskConnection.PRECEDESSOR, DONE, true))
+                    if (relatedTasks.isAll(TaskConnection.PRECEDESSOR, TaskStatus.DONE, true))
                         status = ts;
                     else
                         throw new TaskSetStatusInProgressException(this);
