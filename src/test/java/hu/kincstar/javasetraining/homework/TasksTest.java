@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Feladatok tesztesetek
+ * Feladatok tesztelése
   */
 public class TasksTest {
     @Test

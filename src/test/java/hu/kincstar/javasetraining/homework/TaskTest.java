@@ -3,6 +3,9 @@ package hu.kincstar.javasetraining.homework;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Feladat tesztelése
+ */
 public class TaskTest {
 
     @Test (expected = IllegalArgumentException.class)
